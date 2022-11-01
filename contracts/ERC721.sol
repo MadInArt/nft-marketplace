@@ -23,7 +23,7 @@ contract ERC721 {
         return owner != address(0);
     }
 
-    function _mint(address to, uint256 tokenId) internal {
+    function _mint(address to, uint256 tokenId) internal virtual {
         require(to != address(0), 'ERC721 must be minted to non zero address');
         require(!_isExists(tokenId), 'Token already been minted');
         _tokenOwner[tokenId] = to;
