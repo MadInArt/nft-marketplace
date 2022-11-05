@@ -3,9 +3,11 @@ pragma solidity ^0.8.17;
 
 contract ERC721 {
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+    event Approval(address indexed owmer, address indexed approved, uint256 indexed tokenids);
 
     mapping(uint256 => address) private _tokenOwner;
     mapping(address => uint256) private _ownedTokensCount;
+    mapping(uint256 => address) private _tokenApprovals;
 
     function balanceOf(address _owner) public view returns(uint256) {
         require(_owner != address(0), 'owner query for non-exist token');
@@ -16,6 +18,20 @@ contract ERC721 {
         address owner = _tokenOwner[_tokenId];
         require(owner != address(0), 'onwer query for non-exist token');
         return owner;
+    }
+
+    function transferFrom(address _from, address _to, uint256 _tokenId) public {
+        require(isOwner(msg.sender, _tokenId));
+        _transferFrom(_from,_to, _tokenId);
+    }
+
+    function approve(address _to, uint256 _tokenId) public {
+        address owner = ownerOf(_tokenId);
+        require(_to != owner, 'Error - approval for current owner');
+        require(msg.sender == owner, 'Current caller is not the owner of the token');
+        _tokenApprovals[_tokenId] = -_to;
+
+        emit Approval(owmer, _to, _tokenId);
     }
 
     function _isExists(uint256 tokenId) internal view returns(bool) {
@@ -30,5 +46,21 @@ contract ERC721 {
         _ownedTokensCount[to] += 1;
 
         emit Transfer(address(0), to, tokenId);
+    }
+
+    function _transferFrom(address _from, address _to, uint256 _tokenId) internal {
+        require(_to != address(0), 'Error - Trying to transfer token to zero address');
+        require(ownerOf(_tokenId) == _from, 'Error - trying to send non-existing token for current address');
+        _ownedTokensCount[_from] -= 1;
+        _ownedTokensCount[_to] += 1;
+        _tokenOwner[_tokenId] = _to;
+
+        emit Transfer(_from, _to, _tokenId);
+    }
+
+    function isOwner(address spender, uint256 _tokenId) internal returns(bool) {
+        require( _isExists(_tokenId), 'Token doesnt exist');
+        address owner = ownerOf(_tokenId);
+        return(spender == owner);
     }
 }
