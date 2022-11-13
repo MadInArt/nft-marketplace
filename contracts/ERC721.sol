@@ -10,6 +10,11 @@ contract ERC721 is ERC165, IERC721 {
     mapping(address => uint256) private _ownedTokensCount;
     mapping(uint256 => address) private _tokenApprovals;
 
+    constructor() {
+        _registerInterface(bytes4(keccak256('balanceOf(bytes4)')
+        ^keccak256('ownerOf(bytes4)')^keccak256('transferFrom(bytes4)')));
+    }
+
     function balanceOf(address _owner) public view returns(uint256) {
         require(_owner != address(0), 'owner query for non-exist token');
         return _ownedTokensCount[_owner];

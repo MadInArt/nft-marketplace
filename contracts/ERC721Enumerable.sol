@@ -11,6 +11,11 @@ import "./interfaces/IERC721Enumerable.sol";
     mapping(address => uint256[]) private _ownedTokens;
     mapping(uint256 => uint256) private _ownedTokensIndex;
 
+     constructor() {
+         _registerInterface(bytes4(keccak256('totalSupply(bytes4)')
+         ^keccak256('tokenByIndex(bytes4)')^keccak256('tokenOfOwnerByIndex(bytes4)')));
+     }
+
     function totalSupply( ) public view returns(uint256) {
         return _totalSupply.length;
     }
